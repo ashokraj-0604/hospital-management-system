@@ -3,10 +3,10 @@
 import React from 'react';
 import Image from 'next/image';
 import { Activity, Shield, Users, BarChart3 } from 'lucide-react';
-import { LoginForm } from '../components/auth/LoginForm';
-import { MfaForm } from '../components/auth/MfaForm';
-import { useAuth, useTenant } from '../hooks';
-import type { LoginFormValues } from '../lib/validation';
+import { LoginForm } from '../src/components/auth/LoginForm';
+import { MfaForm } from '../src/components/auth/MfaForm';
+import { useAuth, useTenant } from '../src/hooks';
+import type { LoginFormValues } from '../src/lib/validation';
 
 // ─── Feature Pills ─────────────────────────────────────────────────────────────
 

@@ -16,7 +16,7 @@ export function enableMockApi() {
     if (config.url?.includes('/auth/login')) {
       const body = JSON.parse(config.data);
 
-      if (body.email === 'admin@hospital.com' && body.password === 'Admin@1234') {
+      if (body.email === 'admin@medsocio.com' && body.password === 'Admin@1234') {
         return {
           data: {
             success: true,
@@ -26,7 +26,7 @@ export function enableMockApi() {
                 user_id: 'u-001',
                 email: body.email,
                 full_name: 'Dr. Admin User',
-                role: 'HOSPITAL_ADMIN',
+                role: 'SUPER_ADMIN',
                 hospital_id: 'h-001',
                 is_mfa_enabled: false,
               },

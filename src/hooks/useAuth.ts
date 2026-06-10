@@ -75,7 +75,11 @@ export const useAuth = (): AuthHookReturn => {
         isLoading: false,
       }));
 
-      router.replace(ROUTES.DASHBOARD);
+      const destination =
+        response.user.role === 'SUPER_ADMIN'
+          ? '/super-admin'
+          : ROUTES.DASHBOARD;
+      router.replace(destination);
     } catch (err) {
       const axiosError = err as AxiosError<{ message: string; code?: string }>;
       const message =
@@ -120,7 +124,11 @@ export const useAuth = (): AuthHookReturn => {
         isLoading: false,
       }));
 
-      router.replace(ROUTES.DASHBOARD);
+      const destination =
+        response.user.role === 'SUPER_ADMIN'
+          ? '/super-admin'
+          : ROUTES.DASHBOARD;
+      router.replace(destination);
     } catch {
       setError('Invalid or expired OTP. Please try again.');
     }
