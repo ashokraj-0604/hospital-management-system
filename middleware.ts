@@ -8,6 +8,9 @@ export function middleware(request: NextRequest) {
   if (!token && pathname.startsWith('/super-admin')) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
+  if (!token && pathname.startsWith('/dashboard')) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
 
   // Redirect authenticated users away from login
   if (token && pathname === '/login') {
@@ -18,5 +21,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/super-admin/:path*', '/login'],
+  matcher: ['/super-admin/:path*', '/dashboard/:path*', '/login'],
 };
