@@ -4,14 +4,14 @@ export class AppError extends Error {
   constructor(
     public statusCode: number,
     public message: string,
-    public code?: string,
+    public code: string
   ) {
     super(message);
-    this.name = 'AppError';
+    Object.setPrototypeOf(this, AppError.prototype);
   }
 }
 
-export const errorHandler = (err: Error | AppError, _req: Request, res: Response, _next: NextFunction) => {
+export const errorHandler = (err: Error | AppError, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       success: false,
@@ -20,7 +20,7 @@ export const errorHandler = (err: Error | AppError, _req: Request, res: Response
     });
   }
 
-  console.error('Unexpected error:', err);
+  console.error('Unhandled error:', err);
   res.status(500).json({
     success: false,
     message: 'Internal server error',

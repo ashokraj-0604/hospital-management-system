@@ -9,12 +9,19 @@ export interface AuthRequest extends Request {
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new AppError(401, 'No token provided', 'NO_TOKEN');
+
+    if (!authHeader) {
+      throw new AppError(401, 'Authorization header is required', 'MISSING_AUTHORIZATION');
     }
 
-    const token = authHeader.substring(7);
+    const parts = authHeader.split(' ');
+    if (parts.length !== 2 || parts[0].toLowerCase() !== 'bearer') {
+      throw new AppError(401, 'Invalid authorization header format', 'INVALID_AUTHORIZATION_FORMAT');
+    }
+
+    const token = parts[1];
     const payload = verifyAccessToken(token);
+
     req.user = payload;
     next();
   } catch (error) {
@@ -27,8 +34,8 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     } else {
       res.status(401).json({
         success: false,
-        message: 'Unauthorized',
-        code: 'UNAUTHORIZED',
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN',
       });
     }
   }
