@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import { config } from './config';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
-import tenantRoutes from './routes/tenants';
+import tenantRoutes from './routes/tenant';
 
 const app: Application = express();
 

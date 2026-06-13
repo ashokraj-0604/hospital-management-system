@@ -13,7 +13,7 @@ export function enableMockApi() {
     if (!config?._mock) return Promise.reject(error);
 
     // ── Login ──────────────────────────────────────────────
-    if (config.url?.includes('/auth/login')) {
+    if (config.url?.includes('/auth/')) {
       const body = JSON.parse(config.data);
 
       if (body.email === 'admin@medsocio.com' && body.password === 'Admin@1234') {

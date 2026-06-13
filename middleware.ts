@@ -6,14 +6,14 @@ export function middleware(request: NextRequest) {
 
   // Redirect unauthenticated users to login
   if (!token && pathname.startsWith('/super-admin')) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
   if (!token && pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   // Redirect authenticated users away from login
-  if (token && pathname === '/login') {
+  if (token && pathname === '/') {
     return NextResponse.redirect(new URL('/super-admin', request.url));
   }
 
@@ -21,5 +21,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/super-admin/:path*', '/dashboard/:path*', '/login'],
+  matcher: ['/super-admin/:path*', '/dashboard/:path*', '/'],
 };
