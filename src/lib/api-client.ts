@@ -1,25 +1,37 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import Cookies from 'js-cookie';
-import { API_BASE_URL, ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, ROUTES } from '../constants/app.constants';
-import type { AuthTokens } from '../types';
+import { API_BASE_URL, ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, ROUTES } from '@/src/constants/app.constants';
+import type { AuthTokens } from '@/src/types';
 
 // ─── Axios Instance ───────────────────────────────────────────────────────────
 
-const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true, // sends cookies cross-origin
+const apiClient: AxiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30_000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 // ─── Request Interceptor — Attach Token + Tenant ──────────────────────────────
 
-// Add this interceptor to api-client.ts
-apiClient.interceptors.request.use((config) => {
-  const token = Cookies.get('hms_access_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+apiClient.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const token = Cookies.get(ACCESS_TOKEN_KEY);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Inject hospital subdomain for tenant resolution
+    if (typeof window !== 'undefined') {
+      const subdomain = window.location.hostname.split('.')[0];
+      config.headers['X-Tenant-Subdomain'] = subdomain;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 // ─── Response Interceptor — Token Refresh ────────────────────────────────────
 

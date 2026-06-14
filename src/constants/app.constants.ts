@@ -20,7 +20,7 @@ export const LOCKOUT_DURATION_MINUTES = 30;
 
 // Routes
 export const ROUTES = {
-  LOGIN: '/',
+  LOGIN: '/login',
   FORGOT_PASSWORD: '/login/forgot-password',
   RESET_PASSWORD: '/login/reset-password',
   MFA: '/login/mfa',

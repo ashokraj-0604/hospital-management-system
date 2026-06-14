@@ -24,10 +24,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-<<<<<<< HEAD
-  matcher: ['/super-admin/:path*', '/dashboard/:path*', '/'],
-};
-=======
   matcher: ['/super-admin/:path*', '/dashboard/:path*', '/login'],
 };
->>>>>>> d5b482edff26db13971a075c476d74013d505183
+

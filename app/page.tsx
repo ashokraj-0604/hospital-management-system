@@ -8,8 +8,8 @@ import { MfaForm } from '../src/components/auth/MfaForm';
 import { useAuth, useTenant } from '../src/hooks';
 import type { LoginFormValues } from '../src/lib/validation';
 // src/app/login/page.tsx  — add these two lines at the top
-// import { enableMockApi } from '../src/lib/mock-api';
-// enableMockApi();
+import { enableMockApi } from '../src/lib/mock-api';
+enableMockApi();
 // ─── Feature Pills ─────────────────────────────────────────────────────────────
 
 const FEATURES = [
