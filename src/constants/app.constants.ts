@@ -7,8 +7,8 @@ export const APP_VERSION = '2.0.0';
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1';
 
 // Auth
-export const ACCESS_TOKEN_KEY = 'hms_access_token';
-export const REFRESH_TOKEN_KEY = 'hms_refresh_token';
+export const ACCESS_TOKEN_KEY = '???';
+export const REFRESH_TOKEN_KEY = '???';
 export const USER_KEY = 'hms_user';
 export const TENANT_KEY = 'hms_tenant';
 

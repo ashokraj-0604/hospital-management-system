@@ -17,12 +17,12 @@ export const authService = {
    * Authenticate user — returns user + tokens, or MFA challenge
    */
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
-    const { data } = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/auth/login',
-      credentials,
-    );
-    return data.data;
-  },
+  const { data } = await apiClient.post<LoginResponse>(
+    '/auth/login',
+    credentials,
+  );
+  return data; // ← was data.data, now just data
+},
 
   /**
    * Verify TOTP / OTP for MFA
@@ -56,9 +56,9 @@ export const authService = {
   /**
    * Reset password with token from email
    */
-  resetPassword: async (payload: ResetPasswordPayload): Promise<void> => {
-    await apiClient.post('/auth/reset-password', payload);
-  },
+  resetPassword: async (payload: ResetPasswordPayload & { email?: string }): Promise<void> => {
+  await apiClient.post('/auth/reset-password', payload);
+},
 
   /**
    * Logout — invalidate server-side session

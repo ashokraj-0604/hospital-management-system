@@ -1,5 +1,5 @@
 'use client';
-
+import Cookies from 'js-cookie';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { AxiosError } from 'axios';
@@ -66,9 +66,16 @@ export const useAuth = (): AuthHookReturn => {
       }
 
       // Successful login without MFA
-      tokenUtils.setTokens(response.tokens, credentials.remember_me);
-      userStorage.set(response.user);
+      // Successful login without MFA
+tokenUtils.setTokens(response.tokens, credentials.remember_me);
 
+// Save role cookie for middleware route guard
+Cookies.set('hms_user_role', response.user.role, {
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'strict',
+});
+
+userStorage.set(response.user);
       setState((prev) => ({
         ...prev,
         user: response.user,
