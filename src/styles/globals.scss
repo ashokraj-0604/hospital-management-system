@@ -1,0 +1,18 @@
+@use './tokens.scss';
+@use './theme.scss';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background: var(--color-surface);
+  color: #121212;
+}
+
+input,
+button {
+  font: inherit;
+}
