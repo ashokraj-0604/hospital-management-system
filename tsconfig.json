@@ -24,14 +24,11 @@
   },
   "include": [
     "next-env.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "middleware.ts",
-    "next.config.ts",
-    "tailwind.config.ts",
+    "**/*.ts",
+    "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "hms-backend/**"]
+  "exclude": ["node_modules"]
 }
