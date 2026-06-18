@@ -3,7 +3,7 @@ export interface CustomTableColumn<TData> {
   header: string;
 }
 
-export interface CustomTableProps<TData extends { id?: string | number } & Record<string, string | number>> {
+export interface CustomTableProps<TData extends { id: string | number } & Record<string, string | number>> {
   columns: CustomTableColumn<TData>[];
   rows: TData[];
 }

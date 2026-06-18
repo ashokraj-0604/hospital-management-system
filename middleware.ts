@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { ROUTES } from '@/src/constants/routes';
 
-const PROTECTED_ROUTES = ['/dashboard', '/appointments', '/patients', '/medical-records'] as const;
+const PROTECTED_ROUTES = [
+  ROUTES.admin.dashboard,
+  ROUTES.admin.appointments,
+  ROUTES.doctor.patients,
+  ROUTES.patient.medicalRecords,
+] as const;
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
