@@ -1,15 +1,13 @@
 'use client';
-
+import Link from 'next/link';
 import React from 'react';
 import Image from 'next/image';
 import { Activity, Shield, Users, BarChart3 } from 'lucide-react';
-import { LoginForm } from '../components/auth/LoginForm';
-import { MfaForm } from '../components/auth/MfaForm';
-import { useAuth, useTenant } from '../hooks';
-import type { LoginFormValues } from '../lib/validation';
-// src/app/login/page.tsx  — add these two lines at the top
-// import { enableMockApi } from './lib/mock-api';
-// enableMockApi();
+import { LoginForm } from '@/src/components/auth/LoginForm';
+import { MfaForm } from '@/src/components/auth/MfaForm';
+import { useAuth, useTenant } from '@/src/hooks';
+import type { LoginFormValues } from '@/src/lib/validation';
+
 // ─── Feature Pills ─────────────────────────────────────────────────────────────
 
 const FEATURES = [
@@ -177,11 +175,21 @@ export default function LoginPage() {
                 error={error}
               />
             ) : (
+              <>
               <LoginForm
                 onSubmit={handleLogin}
                 error={error}
                 onClearError={clearError}
               />
+              <p className="text-center text-xs text-slate-500 mt-4">
+                <Link
+                  href="/login/forgot-password"
+                  className="underline hover:text-slate-700 transition-colors"
+                >
+                  Forgot your password?
+                </Link>
+              </p>
+              </>
             )}
           </div>
 
