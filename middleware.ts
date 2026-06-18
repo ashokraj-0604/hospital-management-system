@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const PROTECTED_ROUTES = ['/dashboard', '/appointments', '/patients', '/medical-records'] as const;
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('hms_access_token')?.value;
 
-  const protectedRoutes = ['/dashboard', '/appointments', '/patients', '/medical-records'];
-  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route));
+  const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 
   if (!token && isProtectedRoute) {
     return NextResponse.redirect(new URL('/login', request.url));

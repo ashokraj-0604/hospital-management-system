@@ -12,8 +12,8 @@ export function useLogin(): UseLoginResult {
 
   const mutation = useMutation({
     mutationFn: (values: LoginFormValues) => loginApi.login(values),
-    onError: (error: Error) => {
-      setErrorMessage(error.message);
+    onError: () => {
+      setErrorMessage('Unable to login. Please check your credentials and try again.');
     },
   });
 

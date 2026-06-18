@@ -18,8 +18,7 @@ export async function apiClient<TResponse>(path: string, init?: RequestInit): Pr
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || `Request failed with ${response.status}`);
+    throw new Error(`Request failed with status ${response.status}`);
   }
 
   if (response.status === 204) {
