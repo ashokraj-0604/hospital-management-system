@@ -1,17 +1,16 @@
 import type { Metadata } from 'next';
-import { QueryProvider } from '@/src/lib/query/QueryProvider';
-import '@/src/styles/globals.scss';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Medical HMS',
-  description: 'Hospital Management System frontend',
+  title: 'HMS Platform',
+  description: 'Multi-Tenant Hospital Management System',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-theme="hospital-b">
-      <body>
-        <QueryProvider>{children}</QueryProvider>
+    <html lang="en">
+      <body className="antialiased">
+        {children}
       </body>
     </html>
   );

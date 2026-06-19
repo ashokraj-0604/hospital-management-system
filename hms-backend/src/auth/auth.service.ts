@@ -17,59 +17,68 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto) {
-  // 1. Find user
-  const user = await this.usersRepo.findOne({ where: { email: dto.email } });
-  if (!user) throw new UnauthorizedException('Invalid credentials');
+    const email = this.normalizeEmail(dto.email);
 
-  // 2. Check password
-  const passwordMatch = await bcrypt.compare(dto.password, user.password);
-  if (!passwordMatch) throw new UnauthorizedException('Invalid credentials');
+    // 1. Find user
+    const user = await this.usersRepo
+      .createQueryBuilder('user')
+      .where('LOWER(TRIM(user.email)) = :email', { email })
+      .getOne();
+    if (!user) throw new UnauthorizedException('Invalid credentials');
 
-  // 3. Check active
-  if (!user.isActive) throw new UnauthorizedException('Account is disabled');
+    // 2. Check password
+    const passwordMatch = await bcrypt.compare(dto.password, user.password);
+    if (!passwordMatch) throw new UnauthorizedException('Invalid credentials');
 
-  // 4. Generate tokens
-  const tokens = await this.generateTokens(user);
+    // 3. Check active
+    if (!user.isActive) throw new UnauthorizedException('Account is disabled');
 
-  // 5. Save hashed refresh token
-  const hashedRefresh = await bcrypt.hash(tokens.refresh_token, 10);
-  await this.usersRepo.update(user.id, { refreshToken: hashedRefresh });
+    // 4. Generate tokens (hospitalId now embedded in JWT payload)
+    const tokens = await this.generateTokens(user);
 
-  // Return shape matching frontend LoginResponse type exactly
-  return {
-    requires_mfa: false,
-    tokens: {
-      access_token: tokens.access_token,
-      refresh_token: tokens.refresh_token,
-      expires_in: 900, // 15 minutes
-    },
-    user: {
-      user_id: user.id,
-      email: user.email,
-      full_name: user.name,
-      role: user.role,
-      hospital_id: user.hospitalId ?? '',
-      is_mfa_enabled: false,
-    },
-  };
-}
+    // 5. Save hashed refresh token
+    const hashedRefresh = await bcrypt.hash(tokens.refresh_token, 10);
+    await this.usersRepo.update(user.id, { refreshToken: hashedRefresh });
+
+    // 6. Determine post-login redirect based on role
+    //    SUPER_ADMIN has no hospitalId — goes to platform dashboard
+    //    HOSPITAL_ADMIN goes to their tenant dashboard
+    const redirect =
+      user.role === 'SUPER_ADMIN'
+        ? '/super-admin/dashboard'
+        : `/hospital/${user.hospitalId}/dashboard`;
+
+    return {
+      requires_mfa: false,
+      redirect,                          // ← frontend reads this and calls router.push()
+      tokens: {
+        access_token:  tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        expires_in:    900,              // 15 minutes
+      },
+      user: {
+        user_id:        user.id,
+        email:          user.email,
+        full_name:      user.name,
+        role:           user.role,
+        hospital_id:    user.hospitalId ?? '',
+        is_mfa_enabled: false,
+      },
+    };
+  }
 
   async refresh(refreshToken: string) {
     try {
-      // 1. Verify token
       const payload = await this.jwtService.verifyAsync(refreshToken, {
         secret: this.config.get('JWT_REFRESH_SECRET'),
       });
 
-      // 2. Find user
       const user = await this.usersRepo.findOne({ where: { id: payload.sub } });
       if (!user || !user.refreshToken) throw new UnauthorizedException();
 
-      // 3. Compare stored hash
       const tokenMatch = await bcrypt.compare(refreshToken, user.refreshToken);
       if (!tokenMatch) throw new UnauthorizedException();
 
-      // 4. Generate new tokens
       const tokens = await this.generateTokens(user);
       const hashedRefresh = await bcrypt.hash(tokens.refresh_token, 10);
       await this.usersRepo.update(user.id, { refreshToken: hashedRefresh });
@@ -79,94 +88,117 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
+
   async forgotPassword(email: string) {
-  // 1. Find user — always return same message to prevent email enumeration
-  const user = await this.usersRepo.findOne({ where: { email } });
-  if (!user) {
+    const normalizedEmail = this.normalizeEmail(email);
+    const user = await this.usersRepo
+      .createQueryBuilder('user')
+      .where('LOWER(TRIM(user.email)) = :email', { email: normalizedEmail })
+      .getOne();
+    if (!user) {
+      return { message: 'If that email exists, a reset link has been sent.' };
+    }
+
+    const resetToken =
+      Math.random().toString(36).slice(2) +
+      Math.random().toString(36).slice(2) +
+      Date.now().toString(36);
+
+    const hashedToken = await bcrypt.hash(resetToken, 10);
+    const expiry = new Date(Date.now() + 60 * 60 * 1000);
+
+    await this.usersRepo.update(user.id, {
+      passwordResetToken:  hashedToken,
+      passwordResetExpiry: expiry,
+    });
+
+    console.log(`
+    ─────────────────────────────────────────
+    PASSWORD RESET LINK (dev only)
+    Email: ${normalizedEmail}
+    Token: ${resetToken}
+    Link:  http://localhost:3000/login/reset-password?token=${resetToken}&email=${normalizedEmail}
+    ─────────────────────────────────────────
+    `);
+
     return { message: 'If that email exists, a reset link has been sent.' };
   }
 
-  // 2. Generate reset token
-  const resetToken = Math.random().toString(36).slice(2) +
-    Math.random().toString(36).slice(2) +
-    Date.now().toString(36);
+  async resetPassword(dto: {
+    token: string;
+    new_password: string;
+    confirm_password: string;
+    email: string;
+  }) {
+    if (dto.new_password !== dto.confirm_password) {
+      throw new UnauthorizedException('Passwords do not match');
+    }
 
-  // 3. Hash and save token with 1 hour expiry
-  const hashedToken = await bcrypt.hash(resetToken, 10);
-  const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+    const email = this.normalizeEmail(dto.email);
+    const user = await this.usersRepo
+      .createQueryBuilder('user')
+      .where('LOWER(TRIM(user.email)) = :email', { email })
+      .getOne();
+    if (!user || !user.passwordResetToken || !user.passwordResetExpiry) {
+      throw new UnauthorizedException('Invalid or expired reset token');
+    }
 
-  await this.usersRepo.update(user.id, {
-    passwordResetToken: hashedToken,
-    passwordResetExpiry: expiry,
-  });
+    if (new Date() > user.passwordResetExpiry) {
+      throw new UnauthorizedException(
+        'Reset token has expired. Please request a new one.',
+      );
+    }
 
-  // 4. TODO: Send email with reset link
-  // For now log the token — replace with real email service later
-  console.log(`
-    ─────────────────────────────────────────
-    PASSWORD RESET LINK (dev only)
-    Email: ${email}
-    Token: ${resetToken}
-    Link:  http://localhost:3000/login/reset-password?token=${resetToken}&email=${email}
-    ─────────────────────────────────────────
-  `);
+    const tokenMatch = await bcrypt.compare(dto.token, user.passwordResetToken);
+    if (!tokenMatch) {
+      throw new UnauthorizedException('Invalid or expired reset token');
+    }
 
-  return { message: 'If that email exists, a reset link has been sent.' };
-}
+    const hashedPassword = await bcrypt.hash(dto.new_password, 10);
+    await this.usersRepo.update(user.id, {
+      password:            hashedPassword,
+      passwordResetToken:  null,
+      passwordResetExpiry: null,
+      refreshToken:        null,
+    });
 
-async resetPassword(dto: { token: string; new_password: string; confirm_password: string; email: string }) {
-  // 1. Check passwords match
-  if (dto.new_password !== dto.confirm_password) {
-    throw new UnauthorizedException('Passwords do not match');
+    return {
+      message: 'Password reset successfully. Please login with your new password.',
+    };
   }
-
-  // 2. Find user by email
-  const user = await this.usersRepo.findOne({ where: { email: dto.email } });
-  if (!user || !user.passwordResetToken || !user.passwordResetExpiry) {
-    throw new UnauthorizedException('Invalid or expired reset token');
-  }
-
-  // 3. Check expiry
-  if (new Date() > user.passwordResetExpiry) {
-    throw new UnauthorizedException('Reset token has expired. Please request a new one.');
-  }
-
-  // 4. Verify token
-  const tokenMatch = await bcrypt.compare(dto.token, user.passwordResetToken);
-  if (!tokenMatch) {
-    throw new UnauthorizedException('Invalid or expired reset token');
-  }
-
-  // 5. Hash new password and clear reset token
-  const hashedPassword = await bcrypt.hash(dto.new_password, 10);
-  await this.usersRepo.update(user.id, {
-    password: hashedPassword,
-    passwordResetToken: null,
-    passwordResetExpiry: null,
-    refreshToken: null, // force re-login everywhere
-  });
-
-  return { message: 'Password reset successfully. Please login with your new password.' };
-}
 
   async logout(userId: string) {
     await this.usersRepo.update(userId, { refreshToken: null });
   }
 
-  private async generateTokens(user: User) {
-  const payload = { sub: user.id, email: user.email, role: user.role };
+  // ── Private ────────────────────────────────────────────────────────────────
 
-  const [access_token, refresh_token] = await Promise.all([
-    this.jwtService.signAsync(payload, {
-      secret: this.config.get('JWT_ACCESS_SECRET'),
-      expiresIn: this.config.get('JWT_ACCESS_EXPIRY'),
-    }),
-    this.jwtService.signAsync(payload, {
-      secret: this.config.get('JWT_REFRESH_SECRET'),
-      expiresIn: this.config.get('JWT_REFRESH_EXPIRY'),
-    }),
-  ]);
+  private async generateTokens(user: User) {
+    // hospitalId is included so TenantContextMiddleware can scope every
+    // subsequent request without a DB lookup on each call.
+    // SUPER_ADMIN has hospitalId = null — that is correct and expected.
+    const payload = {
+      sub:        user.id,
+      email:      user.email,
+      role:       user.role,
+      hospitalId: user.hospitalId ?? null,  // ← only change from your original
+    };
+
+    const [access_token, refresh_token] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret:    this.config.get('JWT_ACCESS_SECRET'),
+        expiresIn: this.config.get('JWT_ACCESS_EXPIRY'),
+      }),
+      this.jwtService.signAsync(payload, {
+        secret:    this.config.get('JWT_REFRESH_SECRET'),
+        expiresIn: this.config.get('JWT_REFRESH_EXPIRY'),
+      }),
+    ]);
 
     return { access_token, refresh_token };
+  }
+
+  private normalizeEmail(email: string): string {
+    return email.trim().toLowerCase();
   }
 }

@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
-    "@tanstack/react-query": "^5.101.0",
     "axios": "^1.17.0",
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.8",
@@ -20,10 +19,8 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.78.0",
-    "sass": "^1.101.0",
     "tailwind-merge": "^3.6.0",
-    "zod": "^4.4.3",
-    "zustand": "^5.0.14"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
