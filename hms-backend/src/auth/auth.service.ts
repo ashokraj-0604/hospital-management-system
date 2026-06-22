@@ -46,7 +46,7 @@ export class AuthService {
     const redirect =
       user.role === 'SUPER_ADMIN'
         ? '/super-admin/dashboard'
-        : `/hospital/${user.hospitalId}/dashboard`;
+        : '/hospital-admin';   // ← matches the actual Next.js route (no dynamic :hospitalId segment — tenant scoping is done via JWT, not the URL)
 
     return {
       requires_mfa: false,

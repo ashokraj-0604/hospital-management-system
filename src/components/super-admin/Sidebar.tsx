@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Building2, Users, Settings, CreditCard, FileText, ChevronLeft, ChevronRight, LogOut, ShieldCheck, Bell } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { BRAND } from '@/src/constants/brand.constants';
+import { useAuth } from '@/src/hooks/useAuth';
 
 interface NavItem { href: string; icon: React.ElementType; label: string; exact?: boolean }
 
@@ -22,6 +23,7 @@ const NAV_ITEMS: NavItem[] = [
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const { logout } = useAuth();
   const isActive = (href: string, exact?: boolean) => exact ? pathname === href : pathname.startsWith(href);
 
   return (
@@ -66,7 +68,13 @@ export const Sidebar: React.FC = () => {
             <span className="ml-auto flex h-4 w-4 items-center justify-center rounded-full bg-[#33ABC3] text-[9px] font-bold text-white">3</span>
           </div>
         )}
-        <div className={cn('flex items-center gap-2 px-3 py-2 rounded-xl cursor-pointer hover:bg-[#F4FAFB] transition-colors', collapsed && 'justify-center px-0')}>
+        <button
+          type="button"
+          onClick={() => {
+            void logout();
+          }}
+          className={cn('flex w-full items-center gap-2 px-3 py-2 rounded-xl cursor-pointer hover:bg-[#F4FAFB] transition-colors', collapsed && 'justify-center px-0')}
+        >
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#33ABC3]">
             <ShieldCheck size={14} className="text-white" />
           </div>
@@ -77,7 +85,7 @@ export const Sidebar: React.FC = () => {
             </div>
           )}
           {!collapsed && <LogOut size={13} className="shrink-0 text-[#8AACB3]" />}
-        </div>
+        </button>
         <button onClick={() => setCollapsed(v => !v)}
           className={cn('flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs text-[#8AACB3] hover:bg-[#F4FAFB] hover:text-[#4A7C87] transition-colors', collapsed && 'justify-center px-0')}>
           {collapsed ? <ChevronRight size={14} /> : <><ChevronLeft size={14} /><span>Collapse</span></>}

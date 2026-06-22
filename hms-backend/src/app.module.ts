@@ -7,6 +7,7 @@ import { AuditModule } from './super-admin/audit/audit.module';
 import { BillingModule } from './super-admin/billing/billing.module';
 import { UsersModule } from './users/users.module';
 import { SettingsModule } from './super-admin/settings/settings.module';
+import { TenantsModule } from './tenants/tenants.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -30,6 +31,7 @@ import { SettingsModule } from './super-admin/settings/settings.module';
     BillingModule,
     UsersModule,
     SettingsModule,
+    TenantsModule,
   ],
 })
 export class AppModule {}

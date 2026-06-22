@@ -1,4 +1,5 @@
 import apiClient from '../lib/api-client';
+import { userStorage } from '../lib/token.utils';
 import type {
   LoginCredentials,
   LoginResponse,
@@ -64,7 +65,12 @@ export const authService = {
    * Logout — invalidate server-side session
    */
   logout: async (): Promise<void> => {
-    await apiClient.post('/auth/logout');
+    const user = userStorage.get();
+
+    // Backend expects userId in the request body for logout invalidation.
+    if (!user?.user_id) return;
+
+    await apiClient.post('/auth/logout', { userId: user.user_id });
   },
 };
 

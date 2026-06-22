@@ -6,8 +6,8 @@ import { Activity, ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { authService } from '@/src/services/auth.service';
-import { useTenant } from '@/src/hooks';
+import { authService } from '../login.service';
+import { useTenant } from '../useTenant';
 
 const schema = z.object({
   email: z.string().email('Please enter a valid email address'),

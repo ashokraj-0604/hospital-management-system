@@ -81,6 +81,7 @@ export const tenantStorage = {
 
 export const clearAuthData = () => {
   tokenUtils.clearTokens();
+  Cookies.remove('hms_user_role');
   userStorage.clear();
   tenantStorage.clear();
 };

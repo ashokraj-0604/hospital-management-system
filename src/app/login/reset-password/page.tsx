@@ -7,8 +7,8 @@ import { Activity, ArrowLeft, Lock, Eye, EyeOff, CheckCircle2, XCircle } from 'l
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { authService } from '@/src/services/auth.service';
-import { useTenant } from '@/src/hooks';
+import { authService } from '../login.service';
+import { useTenant } from '../useTenant';
 
 const schema = z.object({
   new_password: z

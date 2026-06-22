@@ -24,7 +24,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label className="block text-sm font-medium text-slate-700">
+          <label className="block text-sm font-medium text-[#0D2F36]">
             {label}
             {props.required && <span className="ml-1 text-red-500">*</span>}
           </label>
@@ -32,23 +32,37 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
         <div className="relative">
           {leftIcon && (
-            <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+            <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[#8AACB3]">
               {leftIcon}
             </div>
           )}
 
           <input
+            suppressHydrationWarning
             ref={ref}
             type={inputType}
             className={cn(
-              'w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-all duration-200',
-              'focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)]',
-              'disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400',
+              'w-full rounded-xl border bg-white px-4 py-3 text-sm',
+              'text-[#0D2F36]',
+              'placeholder:text-[#8AACB3]',
+              'border-[#D6EFF4]',
+              'shadow-sm transition-all duration-200',
+
+              'focus:outline-none',
+              'focus:border-[#33ABC3]',
+              'focus:ring-4 focus:ring-[#33ABC3]/10',
+
+              'disabled:cursor-not-allowed',
+              'disabled:bg-[#F4FAFB]',
+              'disabled:text-[#8AACB3]',
+
               leftIcon && 'pl-10',
               isPassword && 'pr-10',
+
               error
-                ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
-                : 'border-slate-200 hover:border-slate-300',
+                ? 'border-red-400 focus:ring-red-100 focus:border-red-500'
+                : 'hover:border-[#33ABC3]/40',
+
               className,
             )}
             {...props}
@@ -58,7 +72,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+              className="absolute inset-y-0 right-3 flex items-center text-[#8AACB3] hover:text-[#33ABC3] transition-colors"
               tabIndex={-1}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
@@ -75,7 +89,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
 
         {hint && !error && (
-          <p className="text-xs text-slate-500">{hint}</p>
+          <p className="text-xs text-[#4A7C87]">{hint}</p>
         )}
       </div>
     );

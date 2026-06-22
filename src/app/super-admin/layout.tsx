@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Sidebar } from '@/src/components/super-admin/Sidebar';
+import { Sidebar } from './components/Sidebar';
 
 export const metadata: Metadata = {
   title: 'Super Admin — MedSocio',

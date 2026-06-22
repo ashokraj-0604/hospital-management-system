@@ -3,13 +3,11 @@
 import React from 'react';
 import Image from 'next/image';
 import { Activity, Shield, Users, BarChart3 } from 'lucide-react';
-import { LoginForm } from '../components/auth/LoginForm';
-import { MfaForm } from '../components/auth/MfaForm';
-import { useAuth, useTenant } from '../hooks';
-import type { LoginFormValues } from '../lib/validation';
-// src/app/login/page.tsx  — add these two lines at the top
-// import { enableMockApi } from './lib/mock-api';
-// enableMockApi();
+import { LoginForm } from './login/components/LoginForm';
+import { MfaForm } from './login/components/MfaForm';
+import { useAuth } from './login/useAuth'; import { useTenant } from './login/useTenant';
+import type { LoginFormValues } from '@/src/lib/validation';
+
 // ─── Feature Pills ─────────────────────────────────────────────────────────────
 
 const FEATURES = [
@@ -48,7 +46,7 @@ export default function LoginPage() {
       {/* ── Left Panel — Branding ─────────────────────────────────────────── */}
       <div
         className="hidden lg:flex lg:w-[55%] xl:w-[60%] flex-col justify-between relative overflow-hidden"
-        style={{ background: `linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%)` }}
+        style={{ background: `linear-gradient(135deg,var(--color-secondary) 0%,var(--color-primary) 100%)` }}
       >
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-[0.06]"
@@ -88,7 +86,13 @@ export default function LoginPage() {
               </p>
             </div>
           </div>
-
+          <div className="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 w-fit">
+            <Activity size={14} className="text-white" />
+            <span className="text-xs font-semibold text-white">
+              System Online
+            </span>
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+          </div>
           {/* Hero text */}
           <div className="space-y-6">
             <div>
@@ -104,13 +108,16 @@ export default function LoginPage() {
             </div>
 
             {/* Feature list */}
-            <div className="grid grid-cols-1 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {FEATURES.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10">
-                    <Icon size={15} className="text-white" />
-                  </div>
-                  <span className="text-sm text-white/80">{label}</span>
+                <div
+                  key={label}
+                  className="rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 p-4"
+                >
+                  <Icon size={18} className="text-white mb-2" />
+                  <p className="text-xs text-white/80 leading-relaxed">
+                    {label}
+                  </p>
                 </div>
               ))}
             </div>
@@ -124,38 +131,38 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right Panel — Auth Form ────────────────────────────────────────── */}
-      <div className="flex w-full lg:w-[45%] xl:w-[40%] items-center justify-center bg-slate-50 p-6 sm:p-10">
-        <div className="w-full max-w-[420px] space-y-8">
+      <div className="flex w-full lg:w-[45%] xl:w-[40%] items-center justify-center p-6 sm:p-10" style={{ backgroundColor: '#F4FAFB' }}>
+        <div className="w-full max-w-[460px] space-y-8">
 
           {/* Mobile logo */}
           <div className="flex items-center gap-2 lg:hidden">
             <div
               className="flex h-9 w-9 items-center justify-center rounded-xl"
-              style={{ backgroundColor: primaryColor }}
+              style={{ backgroundColor: '#33ABC3' }}
             >
               <Activity size={18} className="text-white" />
             </div>
-            <span className="font-bold text-slate-800">
+            <span className="font-bold text-[#0D2F36]">
               {branding?.app_name ?? 'HMS Platform'}
             </span>
           </div>
 
           {/* Card */}
-          <div className="rounded-2xl bg-white border border-slate-100 shadow-xl shadow-slate-200/50 p-8">
+          <div className="rounded-2xl bg-white border border-[#D6EFF4] shadow-[0_8px_24px_rgba(13,47,54,0.08)]  p-8">
 
             {/* Header */}
             <div className="mb-8">
               {requiresMfa ? (
                 <>
-                  <h2 className="text-2xl font-bold text-slate-900">Two-factor auth</h2>
-                  <p className="mt-1.5 text-sm text-slate-500">
+                  <h2 className="text-2xl font-bold text-[#0D2F36]">Two-factor auth</h2>
+                  <p className="mt-1.5 text-sm text-[#4A7C87]">
                     Verify your identity to continue
                   </p>
                 </>
               ) : (
                 <>
-                  <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
-                  <p className="mt-1.5 text-sm text-slate-500">
+                 <h2 className="text-2xl font-bold text-[#0D2F36]">Welcome back</h2>
+                  <p className="mt-1.5 text-sm text-[#4A7C87]">
                     Sign in to your{' '}
                     <span className="font-medium" style={{ color: primaryColor }}>
                       {branding?.hospital_name ?? 'hospital'}
@@ -167,7 +174,7 @@ export default function LoginPage() {
             </div>
 
             {/* Divider */}
-            <div className="mb-8 h-px bg-slate-100" />
+            <div className="mb-8 h-px" style={{ backgroundColor: '#D6EFF4' }} />
 
             {/* Form */}
             {requiresMfa ? (
@@ -186,13 +193,13 @@ export default function LoginPage() {
           </div>
 
           {/* Help text */}
-          <p className="text-center text-xs text-slate-400">
-            Having trouble?{' '}
+          <p className="text-center text-xs text-[#8AACB3]">
+            Need assistance?{' '}
             <a
               href={`mailto:${branding?.support_email ?? 'support@hms.app'}`}
-              className="underline hover:text-slate-600 transition-colors"
+              className="font-medium text-[#33ABC3] hover:underline"
             >
-              Contact IT support
+              Contact Support
             </a>
           </p>
         </div>

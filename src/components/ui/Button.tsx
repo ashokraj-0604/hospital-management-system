@@ -68,6 +68,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => (
     <button
+      suppressHydrationWarning
       ref={ref}
       disabled={disabled || isLoading}
       className={cn(

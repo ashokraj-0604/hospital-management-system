@@ -31,6 +31,12 @@ interface AuthHookReturn extends AuthHookState {
 
 // ─── useAuth Hook ─────────────────────────────────────────────────────────────
 
+const getPostLoginDestination = (user: User) => {
+  if (user.role === 'SUPER_ADMIN') return '/super-admin';
+  if (user.role === 'HOSPITAL_ADMIN') return ROUTES.HOSPITAL_ADMIN;
+  return ROUTES.DASHBOARD;
+};
+
 export const useAuth = (): AuthHookReturn => {
   const router = useRouter();
 
@@ -66,27 +72,22 @@ export const useAuth = (): AuthHookReturn => {
       }
 
       // Successful login without MFA
-      // Successful login without MFA
-tokenUtils.setTokens(response.tokens, credentials.remember_me);
+      tokenUtils.setTokens(response.tokens, credentials.remember_me);
 
-// Save role cookie for middleware route guard
-Cookies.set('hms_user_role', response.user.role, {
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict',
-});
+      // Save role cookie for middleware route guard
+      Cookies.set('hms_user_role', response.user.role, {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      });
 
-userStorage.set(response.user);
+      userStorage.set(response.user);
       setState((prev) => ({
         ...prev,
         user: response.user,
         isLoading: false,
       }));
 
-      const destination =
-        response.user.role === 'SUPER_ADMIN'
-          ? '/super-admin'
-          : ROUTES.DASHBOARD;
-      router.replace(destination);
+      router.replace(getPostLoginDestination(response.user));
     } catch (err) {
       const axiosError = err as AxiosError<{ message: string; code?: string }>;
       const message =
@@ -121,6 +122,10 @@ userStorage.set(response.user);
       const response = await authService.verifyMfa(payload);
 
       tokenUtils.setTokens(response.tokens);
+      Cookies.set('hms_user_role', response.user.role, {
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+      });
       userStorage.set(response.user);
 
       setState((prev) => ({
@@ -131,11 +136,7 @@ userStorage.set(response.user);
         isLoading: false,
       }));
 
-      const destination =
-        response.user.role === 'SUPER_ADMIN'
-          ? '/super-admin'
-          : ROUTES.DASHBOARD;
-      router.replace(destination);
+      router.replace(getPostLoginDestination(response.user));
     } catch {
       setError('Invalid or expired OTP. Please try again.');
     }
@@ -145,6 +146,8 @@ userStorage.set(response.user);
   const logout = useCallback(async () => {
     try {
       await authService.logout();
+    } catch {
+      // Ignore logout API failures and still clear local session.
     } finally {
       clearAuthData();
       setState({

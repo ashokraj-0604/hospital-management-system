@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useHospitals, useHospitalActions } from '@/src/hooks/super-admin/useHospital';
-import { HospitalTable } from '@/src/components/super-admin/HospitalTable';
-import { AddHospitalModal } from '@/src/components/super-admin/AddHospitalModal';
+import { useHospitals, useHospitalActions } from '../useHospital';
+import { HospitalTable } from '../components/HospitalTable';
+import { AddHospitalModal } from '../components/AddHospitalModal';
 import { Alert } from '@/src/components/ui/Alert';
 import type { Hospital, AddHospitalFormValues } from '@/src/types/super-admin.types';
 import apiClient from '@/src/lib/api-client';
