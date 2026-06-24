@@ -1,0 +1,14 @@
+/* StatCard styles */
+.card {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(13, 47, 54, 0.08);
+  }
+}
+
+.growth {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}

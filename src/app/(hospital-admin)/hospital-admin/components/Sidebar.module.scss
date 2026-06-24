@@ -1,0 +1,30 @@
+/* Sidebar styles */
+/* Sidebar.module.scss */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: width 0.2s ease;
+}
+
+.nav {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.activeIndicator {
+  position: absolute;
+  left: 0;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+}
