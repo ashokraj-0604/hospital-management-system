@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { hospitalAdminService } from './hospitalAdmin.api';
+import { patientsApi } from '../hospital-admin/patients/patient.api';
 import type { HospitalDashboardStats } from '@/src/types/hospitals';
 
 const MOCK_STATS: HospitalDashboardStats = {
@@ -33,18 +34,42 @@ export function useHospitalStats() {
     let mounted = true;
 
     (async () => {
+      let baseStats: HospitalDashboardStats;
+
       try {
-        const data = await hospitalAdminService.getStats();
-        if (mounted) setStats(data);
+        baseStats = await hospitalAdminService.getStats();
       } catch (err) {
         // Fall back to mock data so the dashboard is never empty during dev
         // or if the stats endpoint isn't wired up yet.
+        baseStats = MOCK_STATS;
         if (mounted) {
-          setStats(MOCK_STATS);
           setError(err instanceof Error ? err.message : 'Failed to load stats');
         }
-      } finally {
-        if (mounted) setIsLoading(false);
+      }
+
+      // The Patients module is wired to real data now, so the patient count
+      // card should always reflect the actual registry rather than the
+      // (possibly mocked) value from the general stats endpoint.
+      try {
+        const patientList = await patientsApi.list({ limit: 100 });
+        const todayStr = new Date().toDateString();
+        const newRegistrationsToday = patientList.data.filter(
+          (p) => new Date(p.created_at).toDateString() === todayStr,
+        ).length;
+
+        baseStats = {
+          ...baseStats,
+          total_patients_today: patientList.meta.total,
+          new_registrations_today: newRegistrationsToday,
+        };
+      } catch {
+        // If the patients endpoint is unreachable, leave whatever
+        // total_patients_today came from stats/mock above untouched.
+      }
+
+      if (mounted) {
+        setStats(baseStats);
+        setIsLoading(false);
       }
     })();
 

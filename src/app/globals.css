@@ -2,8 +2,42 @@
 
 /* ─── HMS CSS Variables (defaults; overridden per-tenant via JS) ──────────── */
 :root {
-  --color-primary: #2e75b6;
+  /* Brand */
+  --color-primary: #33abc3;
+  --color-primary-dark: #1d8fa8;
+  --color-primary-light: #e8f8fb;
   --color-secondary: #1b3a5c;
+  --color-accent: #0d6778;
+
+  /* Text */
+  --color-text-primary: #0d2f36;
+  --color-text-secondary: #4a7c87;
+  --color-text-muted: #8aacb3;
+
+  /* Surfaces */
+  --color-background: #f4fafb;
+  --color-surface: #ffffff;
+  --color-surface-hover: rgba(51, 171, 195, 0.06);
+  --color-border: #d6eff4;
+
+  /* Status */
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+  --color-info: #33abc3;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px rgba(13, 47, 54, 0.04);
+  --shadow-md: 0 4px 16px rgba(13, 47, 54, 0.06);
+  --shadow-lg: 0 12px 32px rgba(13, 47, 54, 0.14);
+
+  /* Type */
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 /* ─── Base ─────────────────────────────────────────────────────────────────── */
@@ -16,6 +50,8 @@
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--color-background);
+  color: var(--color-text-primary);
 }
 
 /* ─── Smooth scrollbar ──────────────────────────────────────────────────────── */
