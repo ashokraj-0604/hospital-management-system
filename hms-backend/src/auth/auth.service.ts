@@ -181,7 +181,7 @@ export class AuthService {
       sub:        user.id,
       email:      user.email,
       role:       user.role,
-      hospitalId: user.hospitalId ?? null,  // ← only change from your original
+      hospitalId: user.hospitalId,  // ← only change from your original
     };
 
     const [access_token, refresh_token] = await Promise.all([

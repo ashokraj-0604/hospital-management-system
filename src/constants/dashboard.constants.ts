@@ -46,7 +46,7 @@ export const HOSPITAL_QUICK_ACTIONS = [
   {
     icon: UserPlus,
     label: 'Register Patient',
-    href: '/hospital-admin/patients/new',
+    href: '/hospital-admin/patients',
     color: '#33ABC3',
     bg: '#E8F8FB',
   },

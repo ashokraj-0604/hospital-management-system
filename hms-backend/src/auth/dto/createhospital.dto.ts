@@ -60,10 +60,19 @@ export class CreateHospitalDto {
   // ── Admin account fields ──────────────────────────────────────────────────
 
   /** Name of the hospital admin user */
-  @IsString() @IsNotEmpty() @MinLength(2) @MaxLength(100)
-  admin_name: string;
+@IsString()
+@IsNotEmpty()
+@MinLength(2)
+@MaxLength(100)
+admin_name: string;
 
-  /** Login email for the hospital admin — must be globally unique in users table */
-  @IsEmail() @IsNotEmpty()
-  admin_email: string;
+@IsEmail()
+@IsNotEmpty()
+admin_email: string;
+
+@IsString()
+@IsNotEmpty()
+@MinLength(8)
+@MaxLength(100)
+admin_password: string;
 }

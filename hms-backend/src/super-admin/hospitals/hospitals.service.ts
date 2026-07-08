@@ -127,8 +127,7 @@ export class HospitalsService {
     }
 
     // ── Hash password before transaction (bcrypt is slow — do it outside) ──
-    const tempPassword  = this.generateTempPassword();
-    const password_hash = await bcrypt.hash(tempPassword, 10);
+    const password_hash = await bcrypt.hash(dto.admin_password, 10);
 
     // ── Single transaction ─────────────────────────────────────────────────
     const queryRunner = this.dataSource.createQueryRunner();
@@ -240,7 +239,7 @@ export class HospitalsService {
     return {
       hospital:       savedHospital!,
       admin_email:    adminEmail,
-      temp_password:  tempPassword,
+      temp_password:  dto.admin_password,
       login_redirect: `/hospital/${savedHospital!.hospital_id}/dashboard`,
     };
   }

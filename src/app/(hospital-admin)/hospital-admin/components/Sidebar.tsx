@@ -5,7 +5,8 @@
 import React, { useState } from 'react';
 import {
   LayoutDashboard, Users, CalendarCheck, BedDouble, Stethoscope,
-  FlaskConical, Pill, Receipt, BarChart3, UsersRound, Settings,
+  FlaskConical, Pill, Receipt, BarChart3, Settings, Building2,
+  Building, Contact, HeartPulse, Package,
   Bell, LogOut, ChevronsLeft, ChevronsRight,
 } from 'lucide-react';
 import { BRAND } from '@/src/constants/brand.constants';
@@ -32,27 +33,45 @@ const NAV: NavSection[] = [
     ],
   },
   {
-    section: 'Clinical',
+    section: 'Hospital Management',
     items: [
-      { key: 'patients',     label: 'Patients',      href: '/hospital-admin/patients',     icon: Users },
-      { key: 'appointments', label: 'Appointments',  href: '/hospital-admin/appointments', icon: CalendarCheck, badge: 5 },
-      { key: 'beds',         label: 'Bed management',href: '/hospital-admin/beds',          icon: BedDouble,     badge: 12 },
-      { key: 'doctors',      label: 'Doctors',       href: '/hospital-admin/doctors',       icon: Stethoscope },
-      { key: 'laboratory',   label: 'Laboratory',    href: '/hospital-admin/laboratory',    icon: FlaskConical },
-      { key: 'pharmacy',     label: 'Pharmacy',      href: '/hospital-admin/pharmacy',      icon: Pill },
+      { key: 'hospital-profile', label: 'Hospital Profile', href: '/hospital-admin/profile',     icon: Building2 },
+      { key: 'departments',      label: 'Departments',      href: '/hospital-admin/departments', icon: Building },
+      { key: 'rooms-beds',       label: 'Rooms & Beds',     href: '/hospital-admin/beds',         icon: BedDouble, badge: 12 },
     ],
   },
   {
-    section: 'Finance',
+    section: 'Staff',
     items: [
-      { key: 'billing', label: 'Billing', href: '/hospital-admin/billing', icon: Receipt },
-      { key: 'reports', label: 'Reports', href: '/hospital-admin/reports', icon: BarChart3 },
+      { key: 'staff-doctors',       label: 'Doctors',           href: '/hospital-admin/staff/doctors',       icon: Stethoscope },
+      { key: 'staff-receptionists', label: 'Receptionists',     href: '/hospital-admin/staff/receptionists', icon: Contact },
+      { key: 'staff-nurses',        label: 'Nurses',            href: '/hospital-admin/staff/nurses',        icon: HeartPulse },
+      { key: 'staff-lab',           label: 'Lab Staff',         href: '/hospital-admin/staff/lab',           icon: FlaskConical },
+      { key: 'staff-billing',       label: 'Billing Officers',  href: '/hospital-admin/staff/billing',       icon: Receipt },
+      { key: 'staff-inventory',     label: 'Inventory Managers',href: '/hospital-admin/staff/inventory',     icon: Package },
+    ],
+  },
+  {
+    section: 'Patients',
+    items: [
+      { key: 'patients',   label: 'Patient List', href: '/hospital-admin/patients',            icon: Users },
+      { key: 'admissions', label: 'Admissions',   href: '/hospital-admin/patients/admissions', icon: BedDouble },
+    ],
+  },
+  {
+    section: '',
+    items: [
+      { key: 'appointments', label: 'Appointments', href: '/hospital-admin/appointments', icon: CalendarCheck, badge: 5 },
+      { key: 'laboratory',   label: 'Laboratory',   href: '/hospital-admin/laboratory',   icon: FlaskConical },
+      { key: 'pharmacy',     label: 'Pharmacy',     href: '/hospital-admin/pharmacy',     icon: Pill },
+      { key: 'billing',      label: 'Billing',      href: '/hospital-admin/billing',      icon: Receipt },
+      { key: 'inventory',    label: 'Inventory',    href: '/hospital-admin/inventory',    icon: Package },
+      { key: 'reports',      label: 'Reports',      href: '/hospital-admin/reports',      icon: BarChart3 },
     ],
   },
   {
     section: 'Manage',
     items: [
-      { key: 'staff',    label: 'Staff',    href: '/hospital-admin/staff',    icon: UsersRound },
       { key: 'settings', label: 'Settings', href: '/hospital-admin/settings', icon: Settings },
     ],
   },
@@ -99,8 +118,8 @@ export function Sidebar({ activeKey, profile, onLogout }: SidebarProps) {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-2">
-        {NAV.map((group) => (
-          <div key={group.section || 'root'}>
+        {NAV.map((group, idx) => (
+          <div key={group.section || `root-${idx}`}>
             {group.section && !collapsed && (
               <p
                 className="px-4 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider"

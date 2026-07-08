@@ -90,10 +90,6 @@ export const HospitalTable: React.FC<HospitalTableProps> = ({
             <option value="ENTERPRISE">Enterprise</option>
           </select>
         </div>
-
-        <Button onClick={onAddNew} size="sm" className="bg-[#33ABC3] text-white hover:bg-[#1D8FA8] ml-auto">
-          <Plus size={14} /> Add Hospital
-        </Button>
       </div>
 
       {/* Table */}

@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { HospitalsModule } from './super-admin/hospitals/hospitals.module';
 import { AuditModule } from './super-admin/audit/audit.module';
+import { DatabaseModule } from './database/database.module';
 import { BillingModule } from './super-admin/billing/billing.module';
 import { UsersModule } from './users/users.module';
 import { SettingsModule } from './super-admin/settings/settings.module';
@@ -34,6 +35,7 @@ import { PatientsModule } from './patients/patient.module';
     SettingsModule,
     TenantsModule,
     PatientsModule,
+    DatabaseModule,
   ],
 })
 export class AppModule {}
