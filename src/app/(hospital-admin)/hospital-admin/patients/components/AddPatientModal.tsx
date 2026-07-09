@@ -49,6 +49,10 @@ export default function AddPatientModal({
   onDismissError,
 }: Props) {
   const [form, setForm] = useState<CreatePatientPayload>(emptyForm);
+  const normalizeOptional = (value?: string) => {
+    const trimmed = value?.trim();
+    return trimmed || undefined;
+  };
 
   const isDuplicateError = error instanceof DuplicatePatientError;
 
@@ -57,10 +61,29 @@ export default function AddPatientModal({
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent, forceOverride = false) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
+    forceOverride = false,
+  ) => {
     e.preventDefault();
     try {
-      await onSubmit({ ...form, duplicate_override: forceOverride });
+      const payload: CreatePatientPayload = {
+        full_name: form.full_name.trim(),
+        date_of_birth: form.date_of_birth,
+        gender: form.gender,
+        blood_group: form.blood_group,
+        phone: form.phone.trim(),
+        registration_type: form.registration_type,
+        email: normalizeOptional(form.email),
+        address: normalizeOptional(form.address),
+        emergency_contact_name: normalizeOptional(form.emergency_contact_name),
+        emergency_contact_phone: normalizeOptional(form.emergency_contact_phone),
+        insurance_provider: normalizeOptional(form.insurance_provider),
+        insurance_policy_number: normalizeOptional(form.insurance_policy_number),
+        duplicate_override: forceOverride,
+      };
+
+      await onSubmit(payload);
       onClose();
     } catch {
       // error surfaces via the `error` prop from the mutation
@@ -93,7 +116,7 @@ export default function AddPatientModal({
                 <button
                   type="button"
                   className={styles.overrideButton}
-                  onClick={(e) => handleSubmit(e as any, true)}
+                  onClick={(e) => handleSubmit(e, true)}
                   disabled={isSubmitting}
                 >
                   Register anyway

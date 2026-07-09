@@ -1,0 +1,58 @@
+name: Unused code checks
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unused-code:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            hms-backend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: hms-backend
+
+      - name: Run frontend unused-code scripts
+        run: |
+          npm run typecheck
+          npm run find-orphans
+          npm run depcheck-report
+
+      - name: Run backend unused-code scripts
+        run: |
+          npm run typecheck
+          npm run find-orphans
+          npm run depcheck-report
+        working-directory: hms-backend
+
+      - name: Aggregate and summarize reports
+        if: ${{ always() }}
+        run: ./tools/run-unused-checks.sh
+
+      - name: Upload unused-code artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: unused-code-reports
+          path: |
+            tmp/ts-prune.json
+            tmp/depcheck.json
+          if-no-files-found: warn
