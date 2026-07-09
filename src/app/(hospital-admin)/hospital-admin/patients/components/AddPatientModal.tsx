@@ -25,6 +25,14 @@ const REGISTRATION_TYPES: { value: RegistrationType; label: string }[] = [
   { value: 'REFERRED', label: 'Referred' },
   { value: 'PRE_REGISTERED', label: 'Pre-registered' },
 ];
+const OPTIONAL_STRING_FIELDS: (keyof CreatePatientPayload)[] = [
+  'email',
+  'address',
+  'emergency_contact_name',
+  'emergency_contact_phone',
+  'insurance_provider',
+  'insurance_policy_number',
+];
 
 const emptyForm: CreatePatientPayload = {
   full_name: '',
@@ -57,10 +65,31 @@ export default function AddPatientModal({
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent, forceOverride = false) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
+    forceOverride = false,
+  ) => {
     e.preventDefault();
     try {
-      await onSubmit({ ...form, duplicate_override: forceOverride });
+      const payload: CreatePatientPayload = {
+        ...form,
+        full_name: form.full_name.trim(),
+        phone: form.phone.trim(),
+        duplicate_override: forceOverride,
+      };
+
+      OPTIONAL_STRING_FIELDS.forEach((field) => {
+        const value = payload[field];
+        if (typeof value !== 'string') return;
+        const trimmed = value.trim();
+        if (!trimmed) {
+          delete payload[field];
+          return;
+        }
+        payload[field] = trimmed;
+      });
+
+      await onSubmit(payload);
       onClose();
     } catch {
       // error surfaces via the `error` prop from the mutation
@@ -93,7 +122,7 @@ export default function AddPatientModal({
                 <button
                   type="button"
                   className={styles.overrideButton}
-                  onClick={(e) => handleSubmit(e as any, true)}
+                  onClick={(e) => handleSubmit(e, true)}
                   disabled={isSubmitting}
                 >
                   Register anyway
