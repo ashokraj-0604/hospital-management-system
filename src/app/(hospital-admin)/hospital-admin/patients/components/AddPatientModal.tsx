@@ -25,14 +25,6 @@ const REGISTRATION_TYPES: { value: RegistrationType; label: string }[] = [
   { value: 'REFERRED', label: 'Referred' },
   { value: 'PRE_REGISTERED', label: 'Pre-registered' },
 ];
-const OPTIONAL_STRING_FIELDS: (keyof CreatePatientPayload)[] = [
-  'email',
-  'address',
-  'emergency_contact_name',
-  'emergency_contact_phone',
-  'insurance_provider',
-  'insurance_policy_number',
-];
 
 const emptyForm: CreatePatientPayload = {
   full_name: '',
@@ -57,6 +49,10 @@ export default function AddPatientModal({
   onDismissError,
 }: Props) {
   const [form, setForm] = useState<CreatePatientPayload>(emptyForm);
+  const normalizeOptional = (value?: string) => {
+    const trimmed = value?.trim();
+    return trimmed || undefined;
+  };
 
   const isDuplicateError = error instanceof DuplicatePatientError;
 
@@ -72,22 +68,20 @@ export default function AddPatientModal({
     e.preventDefault();
     try {
       const payload: CreatePatientPayload = {
-        ...form,
         full_name: form.full_name.trim(),
+        date_of_birth: form.date_of_birth,
+        gender: form.gender,
+        blood_group: form.blood_group,
         phone: form.phone.trim(),
+        registration_type: form.registration_type,
+        email: normalizeOptional(form.email),
+        address: normalizeOptional(form.address),
+        emergency_contact_name: normalizeOptional(form.emergency_contact_name),
+        emergency_contact_phone: normalizeOptional(form.emergency_contact_phone),
+        insurance_provider: normalizeOptional(form.insurance_provider),
+        insurance_policy_number: normalizeOptional(form.insurance_policy_number),
         duplicate_override: forceOverride,
       };
-
-      OPTIONAL_STRING_FIELDS.forEach((field) => {
-        const value = payload[field];
-        if (typeof value !== 'string') return;
-        const trimmed = value.trim();
-        if (!trimmed) {
-          delete payload[field];
-          return;
-        }
-        payload[field] = trimmed;
-      });
 
       await onSubmit(payload);
       onClose();
