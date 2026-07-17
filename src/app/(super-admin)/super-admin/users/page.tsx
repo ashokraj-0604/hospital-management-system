@@ -55,8 +55,15 @@ export default function UsersPage() {
   const [roleFilter,   setRoleFilter]   = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [users,        setUsers]        = useState<PlatformUser[]>([]);
+  const [hospitals,    setHospitals]    = useState<Array<{ hospital_id: string; hospital_name: string }>>([]);
   const [apiLoading,   setApiLoading]   = useState(true);
   const [apiError,     setApiError]     = useState('');
+  const [editingUser,  setEditingUser]  = useState<PlatformUser | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editRole, setEditRole] = useState('');
+  const [editIsActive, setEditIsActive] = useState(true);
+  const [editHospitalId, setEditHospitalId] = useState('');
+  const [isSavingUser, setIsSavingUser] = useState(false);
 
   useEffect(() => {
     setApiLoading(true);
@@ -65,6 +72,17 @@ export default function UsersPage() {
       .then(res => setUsers(res.data?.items ?? []))
       .catch(() => setApiError('Failed to load users. Please refresh the page.'))
       .finally(() => setApiLoading(false));
+  }, []);
+
+  useEffect(() => {
+    apiClient.get('/hospitals?limit=500')
+      .then((res) => {
+        const items = res.data?.items ?? [];
+        setHospitals(items.map((h: any) => ({ hospital_id: h.hospital_id, hospital_name: h.hospital_name })));
+      })
+      .catch(() => {
+        setHospitals([]);
+      });
   }, []);
 
   const filtered = useMemo(() => {
@@ -84,10 +102,52 @@ export default function UsersPage() {
 
   const handleToggleStatus = async (u: PlatformUser) => {
     try {
-      await apiClient.patch(`/users/${u.user_id}/${u.is_active ? 'deactivate' : 'activate'}`);
+      await apiClient.patch(`/users/${u.user_id}`, { isActive: !u.is_active });
       setUsers(prev => prev.map(x => x.user_id === u.user_id ? { ...x, is_active: !x.is_active } : x));
     } catch {
       alert('Failed to update user status.');
+    }
+  };
+
+  const handleEditUser = (u: PlatformUser) => {
+    setEditingUser(u);
+    setEditName(u.full_name);
+    setEditRole(u.role);
+    setEditIsActive(u.is_active);
+    setEditHospitalId(u.hospital_id ?? '');
+  };
+
+  const handleSaveUserEdit = async () => {
+    if (!editingUser) return;
+
+    setIsSavingUser(true);
+    try {
+      await apiClient.patch(`/users/${editingUser.user_id}`, {
+        name: editName.trim(),
+        role: editRole,
+        isActive: editIsActive,
+        hospitalId: editHospitalId.trim() || null,
+      });
+      setUsers((prev) =>
+        prev.map((x) =>
+          x.user_id === editingUser.user_id
+            ? {
+                ...x,
+                full_name: editName.trim(),
+                role: editRole,
+                is_active: editIsActive,
+                hospital_id: editHospitalId.trim(),
+                hospital_name:
+                  hospitals.find((h) => h.hospital_id === editHospitalId.trim())?.hospital_name ?? x.hospital_name,
+              }
+            : x,
+        ),
+      );
+      setEditingUser(null);
+    } catch {
+      alert('Failed to update user.');
+    } finally {
+      setIsSavingUser(false);
     }
   };
 
@@ -169,11 +229,14 @@ export default function UsersPage() {
                   <td className="px-5 py-4">
                     <DotBadge active={u.is_active} />
                   </td>
-                  <td className="px-5 py-4 text-xs text-[#8AACB3]">{timeAgo(u.last_login_at)}</td>
+                  <td className="px-5 py-4 text-xs text-[#8AACB3]" title={u.last_login_at ?? 'Never logged in'}>
+                    {u.last_login_at ? `${timeAgo(u.last_login_at)} (${new Date(u.last_login_at).toLocaleString('en-IN')})` : 'Never'}
+                  </td>
                   <td className="px-5 py-4">
                     <ActionMenu
                       items={[
                         { label: 'View profile', onClick: () => {} },
+                        { label: 'Edit', onClick: () => handleEditUser(u) },
                         { label: 'Reset password', onClick: () => {} },
                         {
                           label: u.is_active ? 'Deactivate' : 'Activate',
@@ -195,6 +258,83 @@ export default function UsersPage() {
           </p>
         </TableCardFooter>
       </TableCard>
+
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-[#D6EFF4] bg-white p-5 shadow-xl">
+            <h3 className="text-base font-bold text-[#0D2F36]">Edit User</h3>
+            <p className="mt-1 text-xs text-[#8AACB3]">{editingUser.full_name} ({editingUser.email})</p>
+
+            <label className="mt-4 block text-sm text-[#4A7C87]">
+              Full Name
+              <input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-[#D6EFF4] bg-[#F4FAFB] px-3 py-2 text-sm text-[#0D2F36]"
+              />
+            </label>
+
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <label className="block text-sm text-[#4A7C87]">
+                Role
+                <select
+                  value={editRole}
+                  onChange={(e) => setEditRole(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-[#D6EFF4] bg-[#F4FAFB] px-3 py-2 text-sm text-[#0D2F36]"
+                >
+                  {ALL_ROLES.map((role) => (
+                    <option key={role} value={role}>{role}</option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="block text-sm text-[#4A7C87]">
+                Status
+                <select
+                  value={editIsActive ? 'ACTIVE' : 'INACTIVE'}
+                  onChange={(e) => setEditIsActive(e.target.value === 'ACTIVE')}
+                  className="mt-1 w-full rounded-xl border border-[#D6EFF4] bg-[#F4FAFB] px-3 py-2 text-sm text-[#0D2F36]"
+                >
+                  <option value="ACTIVE">ACTIVE</option>
+                  <option value="INACTIVE">INACTIVE</option>
+                </select>
+              </label>
+            </div>
+
+            <label className="mt-3 block text-sm text-[#4A7C87]">
+              Hospital ID (UUID)
+              <select
+                value={editHospitalId}
+                onChange={(e) => setEditHospitalId(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-[#D6EFF4] bg-[#F4FAFB] px-3 py-2 text-sm text-[#0D2F36]"
+              >
+                <option value="">No hospital assigned</option>
+                {hospitals.map((h) => (
+                  <option key={h.hospital_id} value={h.hospital_id}>
+                    {h.hospital_name} ({h.hospital_id})
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <button
+                onClick={() => setEditingUser(null)}
+                className="rounded-xl border border-[#D6EFF4] bg-white px-4 py-2 text-sm font-medium text-[#4A7C87]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveUserEdit}
+                disabled={isSavingUser}
+                className="rounded-xl bg-[#33ABC3] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              >
+                {isSavingUser ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </PageLayout>
   );
 }

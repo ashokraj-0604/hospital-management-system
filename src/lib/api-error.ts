@@ -7,6 +7,10 @@ type ErrorResponse = {
 
 export function getApiErrorMessage(error: unknown, fallback: string): string {
   if (isAxiosError<ErrorResponse>(error)) {
+    if (!error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error')) {
+      return 'Unable to reach backend API. Make sure backend is running on http://localhost:4000.';
+    }
+
     const message = error.response?.data?.message;
 
     if (Array.isArray(message)) {

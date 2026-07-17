@@ -31,11 +31,19 @@ interface AuthHookReturn extends AuthHookState {
 
 // ─── useAuth Hook ─────────────────────────────────────────────────────────────
 
-const getPostLoginDestination = (user: User) => {
-  if (user.role === 'SUPER_ADMIN') return '/super-admin';
-  if (user.role === 'HOSPITAL_ADMIN') return ROUTES.HOSPITAL_ADMIN;
-  return ROUTES.DASHBOARD;
+const HOME_BY_ROLE: Record<string, string> = {
+  SUPER_ADMIN: '/super-admin',
+  HOSPITAL_ADMIN: '/hospital-admin',
+  DOCTOR: '/doctor',
+  RECEPTIONIST: '/receptionist',
+  NURSE: '/nurse',
+  PHARMACIST: '/pharmacy',
+  LAB_TECHNICIAN: '/laboratory',
+  BILLING_OFFICER: '/billing',
+  INVENTORY_MANAGER: '/inventory',
 };
+
+const getPostLoginDestination = (user: User) => HOME_BY_ROLE[user.role] ?? ROUTES.DASHBOARD;
 
 export const useAuth = (): AuthHookReturn => {
   const router = useRouter();

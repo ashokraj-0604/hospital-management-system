@@ -2,7 +2,7 @@
 
 import { MoreVertical, UserX } from 'lucide-react';
 import { useState } from 'react';
-import { Patient, PatientListResponse } from '../patient.type';
+import { Patient, PatientListResponse } from '../patients.types';
 import styles from './PatientTable.module.scss';
 
 interface Props {

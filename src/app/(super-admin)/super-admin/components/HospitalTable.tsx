@@ -42,13 +42,14 @@ interface HospitalTableProps {
   onFilterPlan: (p: string) => void;
   onAddNew: () => void;
   onView: (h: Hospital) => void;
+  onEdit: (h: Hospital) => void;
   onSuspend: (h: Hospital) => void;
   onActivate: (h: Hospital) => void;
 }
 
 export const HospitalTable: React.FC<HospitalTableProps> = ({
   hospitals, isLoading, onSearch, onFilterStatus, onFilterPlan,
-  onAddNew, onView, onSuspend, onActivate,
+  onAddNew, onView, onEdit, onSuspend, onActivate,
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
 
@@ -165,6 +166,7 @@ export const HospitalTable: React.FC<HospitalTableProps> = ({
                     {openMenu === h.hospital_id && (
                       <div className="absolute right-0 z-50 mt-1 w-40 rounded-xl border border-[#D6EFF4] bg-white shadow-lg py-1">
                         <button onClick={() => { onView(h); setOpenMenu(null); }} className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[#4A7C87] hover:bg-[#F4FAFB]">View details</button>
+                        <button onClick={() => { onEdit(h); setOpenMenu(null); }} className="flex w-full items-center gap-2 px-3 py-2 text-sm text-[#4A7C87] hover:bg-[#F4FAFB]">Edit</button>
                         {h.status === 'SUSPENDED'
                           ? <button onClick={() => { onActivate(h); setOpenMenu(null); }} className="flex w-full items-center gap-2 px-3 py-2 text-sm text-emerald-600 hover:bg-[#F4FAFB]">Activate</button>
                           : <button onClick={() => { onSuspend(h); setOpenMenu(null); }} className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-[#F4FAFB]">Suspend</button>

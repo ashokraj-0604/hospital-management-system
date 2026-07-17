@@ -33,6 +33,7 @@ export interface Hospital {
 }
 
 export interface HospitalCreatePayload {
+  hospital_id?: string;
   hospital_name: string;
   hospital_code: string;
   legal_entity_name?: string;
@@ -128,6 +129,7 @@ export interface Invoice {
 }
 
 export interface AddHospitalFormValues {
+  hospital_id: string;
   hospital_name: string;
   hospital_code: string;
   legal_entity_name: string;

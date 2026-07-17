@@ -53,14 +53,14 @@ export const HOSPITAL_QUICK_ACTIONS = [
   {
     icon: CalendarPlus,
     label: 'Book Appointment',
-    href: '/hospital-admin/appointments/new',
+    href: '/hospital-admin/appointments',
     color: '#7C3AED',
     bg: '#F5F3FF',
   },
   {
     icon: Stethoscope,
     label: 'Add Doctor',
-    href: '/hospital-admin/doctors/new',
+    href: '/hospital-admin/staff/doctors',
     color: '#059669',
     bg: '#ECFDF5',
   },
@@ -72,3 +72,6 @@ export const HOSPITAL_QUICK_ACTIONS = [
     bg: '#FFFBEB',
   },
 ];
+
+export const HOSPITAL_APPOINTMENT_TYPES = ['OPD', 'IPD', 'EMERGENCY'] as const;
+export const RECEPTIONIST_SHIFTS = ['MORNING', 'EVENING', 'NIGHT'] as const;

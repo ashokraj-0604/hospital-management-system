@@ -8,7 +8,7 @@ import {
   Gender,
   BloodGroup,
   RegistrationType,
-} from '../patient.type';
+} from '../patients.types';
 import styles from './AddPatientModal.module.scss';
 
 interface Props {
@@ -110,7 +110,7 @@ export default function AddPatientModal({
 
           <div className={styles.sectionTitle}>Demographics</div>
           <div className={styles.grid}>
-            <label className={styles.fullWidth}>
+            <label className={`${styles.field} ${styles.fullWidth}`}>
               Full Name *
               <input
                 required
@@ -119,7 +119,7 @@ export default function AddPatientModal({
               />
             </label>
 
-            <label>
+            <label className={styles.field}>
               Date of Birth *
               <input
                 required
@@ -129,7 +129,7 @@ export default function AddPatientModal({
               />
             </label>
 
-            <label>
+            <label className={styles.field}>
               Gender *
               <select value={form.gender} onChange={(e) => update('gender', e.target.value)}>
                 <option value="MALE">Male</option>
@@ -138,7 +138,7 @@ export default function AddPatientModal({
               </select>
             </label>
 
-            <label>
+            <label className={styles.field}>
               Blood Group
               <select
                 value={form.blood_group}
@@ -152,7 +152,7 @@ export default function AddPatientModal({
               </select>
             </label>
 
-            <label>
+            <label className={styles.field}>
               Registration Type
               <select
                 value={form.registration_type}
@@ -169,7 +169,7 @@ export default function AddPatientModal({
 
           <div className={styles.sectionTitle}>Contact</div>
           <div className={styles.grid}>
-            <label>
+            <label className={styles.field}>
               Phone *
               <input
                 required
@@ -177,7 +177,7 @@ export default function AddPatientModal({
                 onChange={(e) => update('phone', e.target.value)}
               />
             </label>
-            <label>
+            <label className={styles.field}>
               Email
               <input
                 type="email"
@@ -185,18 +185,18 @@ export default function AddPatientModal({
                 onChange={(e) => update('email', e.target.value)}
               />
             </label>
-            <label className={styles.fullWidth}>
+            <label className={`${styles.field} ${styles.fullWidth}`}>
               Address
               <input value={form.address} onChange={(e) => update('address', e.target.value)} />
             </label>
-            <label>
+            <label className={styles.field}>
               Emergency Contact Name
               <input
                 value={form.emergency_contact_name}
                 onChange={(e) => update('emergency_contact_name', e.target.value)}
               />
             </label>
-            <label>
+            <label className={styles.field}>
               Emergency Contact Phone
               <input
                 value={form.emergency_contact_phone}
@@ -207,14 +207,14 @@ export default function AddPatientModal({
 
           <div className={styles.sectionTitle}>Insurance (optional)</div>
           <div className={styles.grid}>
-            <label>
+            <label className={styles.field}>
               Insurance Provider
               <input
                 value={form.insurance_provider}
                 onChange={(e) => update('insurance_provider', e.target.value)}
               />
             </label>
-            <label>
+            <label className={styles.field}>
               Policy Number
               <input
                 value={form.insurance_policy_number}

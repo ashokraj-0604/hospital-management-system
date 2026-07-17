@@ -29,12 +29,27 @@ const STEPS = [
 ];
 
 const EMPTY: AddHospitalFormValues = {
+  hospital_id: '',
   hospital_name: '', hospital_code: '', legal_entity_name: '', gstin: '', registration_no: '',
   address: '', city: '', state: '', pincode: '', primary_phone: '', primary_email: '', website_url: '',
   subscription_plan: 'BASIC', subscription_expires_at: '', mrn_prefix: '', total_beds: 0,
   modules: ['OPD', 'BILLING'],
   admin_name: '', admin_email: '', admin_password: '',
   primary_color: '#33ABC3', secondary_color: '#0D6778', app_name: '',
+};
+
+const UUID_V4_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const generateHospitalId = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.floor(Math.random() * 16);
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 };
 
 // ─── Small helpers ────────────────────────────────────────────────────────────
@@ -71,7 +86,10 @@ interface Props {
 
 export const AddHospitalModal: React.FC<Props> = ({ open, onClose, onSubmit }) => {
   const [step, setStep]       = useState(0);
-  const [form, setForm]       = useState<AddHospitalFormValues>(EMPTY);
+  const [form, setForm]       = useState<AddHospitalFormValues>({
+    ...EMPTY,
+    hospital_id: generateHospitalId(),
+  });
   const [loading, setLoading] = useState(false);
   const [done, setDone]       = useState(false);
   const [error, setError]     = useState<string | null>(null);
@@ -85,7 +103,13 @@ export const AddHospitalModal: React.FC<Props> = ({ open, onClose, onSubmit }) =
     setLoading(true);
     setError(null);
     try {
-      await onSubmit(form);
+      const payload = {
+        ...form,
+        hospital_id: UUID_V4_REGEX.test(form.hospital_id)
+          ? form.hospital_id
+          : generateHospitalId(),
+      };
+      await onSubmit(payload);
       setDone(true);
     } catch (error) {
       setError(getApiErrorMessage(error, 'Unable to create hospital. Please try again.'));
@@ -96,7 +120,10 @@ export const AddHospitalModal: React.FC<Props> = ({ open, onClose, onSubmit }) =
 
   const handleClose = () => {
     setStep(0);
-    setForm(EMPTY);
+    setForm({
+      ...EMPTY,
+      hospital_id: generateHospitalId(),
+    });
     setDone(false);
     setError(null);
     onClose();

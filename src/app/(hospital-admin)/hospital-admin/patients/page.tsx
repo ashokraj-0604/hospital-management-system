@@ -5,7 +5,7 @@ import { Plus, Search } from 'lucide-react';
 import { usePatients } from './usePatients';
 import PatientTable from './components/PatientTable';
 import AddPatientModal from './components/AddPatientModal';
-import styles from './patient.module.scss';
+import styles from './patients.module.scss';
 
 export default function PatientsPage() {
   const [isAddOpen, setIsAddOpen] = useState(false);

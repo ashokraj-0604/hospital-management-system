@@ -1,12 +1,12 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { patientsApi } from './patient.api';
+import { patientsApi } from './patients.api';
 import {
   CreatePatientPayload,
   UpdatePatientPayload,
   PatientListParams,
   DuplicatePatientError,
-} from './patient.type';
+} from './patients.types';
 
 export function usePatients() {
   const qc = useQueryClient();

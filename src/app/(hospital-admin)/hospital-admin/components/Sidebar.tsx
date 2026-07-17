@@ -55,7 +55,7 @@ const NAV: NavSection[] = [
     section: 'Patients',
     items: [
       { key: 'patients',   label: 'Patient List', href: '/hospital-admin/patients',            icon: Users },
-      { key: 'admissions', label: 'Admissions',   href: '/hospital-admin/patients/admissions', icon: BedDouble },
+      { key: 'admissions', label: 'Admissions',   href: '/hospital-admin/admissions', icon: BedDouble },
     ],
   },
   {

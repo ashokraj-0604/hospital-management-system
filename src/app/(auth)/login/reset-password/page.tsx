@@ -93,6 +93,7 @@ function ResetPasswordForm() {
     try {
       await authService.resetPassword({
         token,
+        email,
         new_password: values.new_password,
         confirm_password: values.confirm_password,
       });
